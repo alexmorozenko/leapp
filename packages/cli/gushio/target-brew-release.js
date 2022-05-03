@@ -43,7 +43,7 @@ module.exports = {
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
-      const tarballUrl = result.stdout
+      const tarballUrl = result.stdout.trim()
 
       result = shellJs.exec(`curl -o tarball ${tarballUrl}`)
       if (result.code !== 0) {
