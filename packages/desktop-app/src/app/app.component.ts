@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
-import { environment } from "../environments/environment";
 import { AppService } from "./services/app.service";
 import { Router } from "@angular/router";
 import { setTheme } from "ngx-bootstrap/utils";
@@ -92,15 +91,15 @@ export class AppComponent implements OnInit {
     // Use ngx bootstrap 4
     setTheme("bs4");
 
-    if (environment.production) {
+    /* if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
       console.warn = () => {};
       console.log = () => {};
-    }
+    } */
 
     // Prevent Dev Tool to show on production mode
-    this.windowService.blockDevToolInProductionMode();
+    //this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
     this.updaterService.createFoldersIfMissing();
