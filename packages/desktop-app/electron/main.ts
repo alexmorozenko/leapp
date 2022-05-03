@@ -89,6 +89,7 @@ const generateMainWindow = () => {
     win.setMenu(null);
     win.loadURL(url.format({ pathname: windowDefaultConfig.dir + "/index.html", protocol: "file:", slashes: true }));
     win.center();
+    win.webContents.openDevTools();
 
     // Set new minimum windows for opened tool. Note: it can also be modified at runtime
     win.setMinimumSize(1200, 680);
