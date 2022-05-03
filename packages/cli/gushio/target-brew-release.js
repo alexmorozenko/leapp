@@ -4,23 +4,17 @@ module.exports = {
     description: 'Release leapp cli on npm and homebrew',
     version: '0.1'
   },
-  deps: [
-    {name: '@aws-sdk/client-s3', version: '^3.67.0'},
-  ],
+  deps: [],
   run: async () => {
     const shellJs = await gushio.import('shelljs')
     const path = await gushio.import('path')
     const os = await gushio.import('os')
-    const {S3Client, PutObjectCommand} = await gushio.import('@aws-sdk/client-s3')
 
     const cliPackageJson = require('../package.json')
     const getFormula = require('./homebrew/get-formula')
 
-    const tarballTargets = "darwin-x64"
     const gitHubOrganization = "Noovolari"
     const gitHubRepo = "homebrew-brew"
-    const s3Bucket = "noovolari-leapp-website-distribution-cli"
-    const bucketRegion = "eu-west-1"
 
     const gitPushToken = process.env['GIT_PUSH_TOKEN']
     const credentials = gitPushToken ? `${gitPushToken}:x-oauth-basic@` : ''
@@ -28,7 +22,6 @@ module.exports = {
     const tempDir = os.tmpdir();
     const formulaRepoPath = path.join(tempDir, gitHubRepo);
 
-    const baseS3PublicUrl = `https://${s3Bucket}.s3.${bucketRegion}.amazonaws.com/`
     const leappCliVersion = cliPackageJson.version
     const gitFormulaCommitMessage = `leapp-cli v${leappCliVersion}`;
 
@@ -43,40 +36,30 @@ module.exports = {
         throw new Error(result.stderr)
       }
 
-      console.log('Generating tarballs... ')
 
-      shellJs.cd(path.join(__dirname, '..'))
-      result = shellJs.exec(`npx oclif pack tarballs --targets=${tarballTargets}`)
+      console.log('Downloading tarball... ')
+
+      result = shellJs.exec('npm view @noovolari/leapp-cli dist.tarball')
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+      const tarballUrl = result.stdout
+
+      result = shellJs.exec(`curl -o tarball ${tarballUrl}`)
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
 
-      shellJs.cd(path.join(__dirname, '../dist'))
-      const tarballFileName = shellJs.ls('*.xz')[0]
-
-      result = shellJs.exec(`openssl dgst -sha256 -r ${tarballFileName}`)
+      result = shellJs.exec(`openssl dgst -sha256 -r tarball`)
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
       const tarballSha256 = result.stdout.split(' ')[0]
 
 
-      console.log('Uploading tarballs... ')
-
-      const bucketParams = {
-        Bucket: s3Bucket,
-        Key: `${leappCliVersion}/${tarballFileName}`,
-        Body: await fs.readFile(path.join(__dirname, '../dist', tarballFileName)),
-      };
-      const s3Client = new S3Client({region: bucketRegion});
-      await s3Client.send(new PutObjectCommand(bucketParams));
-
-      const tarballS3Url = baseS3PublicUrl + bucketParams.Key
-      const formula = getFormula(leappCliVersion, tarballS3Url, tarballSha256)
-
-
       console.log('Updating formula... ')
 
+      const formula = getFormula(leappCliVersion, tarballUrl, tarballSha256)
       await fs.writeFile(path.join(formulaRepoPath, 'Formula/leapp-cli.rb'), formula)
 
 
