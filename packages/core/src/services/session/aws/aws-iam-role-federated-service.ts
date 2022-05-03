@@ -91,7 +91,11 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     try {
       // Get idpUrl
       idpUrl = this.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
+      console.log("idp url: ");
+      console.log(idpUrl);
       needToAuthenticate = await this.awsAuthenticationService.needAuthentication(idpUrl);
+      console.log("need to authenticate? ");
+      console.log(needToAuthenticate);
     } catch (err) {
       throw new LoggedException(err.message, this, LogLevel.warn);
     } finally {
@@ -109,6 +113,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     // Setup STS to generate the credentials
     const sts = new Aws.STS(this.awsCoreService.stsOptions(session));
 
+    console.log("STS: ");
+    console.log(sts);
+
     // Params for the calls
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -120,6 +127,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       DurationSeconds: this.samlRoleSessionDuration,
     };
+
+    console.log("params (PrincipalArn, RoleArn, SAMLAssertion, DurationSeconds): ");
+    console.log(params);
 
     // Invoke assumeRoleWithSAML
     let assumeRoleWithSamlResponse: Aws.STS.AssumeRoleWithSAMLResponse;

@@ -34,6 +34,8 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
       idpWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        //console.log('need authentication - onbeforerequest details:');
+        //console.log(details);
         if (this.leappCoreService.authenticationService.isAuthenticationUrl(CloudProviderType.aws, details.url)) {
           idpWindow = null;
           resolve(true);
@@ -49,6 +51,8 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
         });
       });
       // Start the process
+      console.log("need auth - sanitized field:");
+      console.log(sanitizedField);
       idpWindow.loadURL(sanitizedField);
     });
   }
@@ -72,6 +76,8 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
     // to construct the ideal method to deal with the construction of the response
     return new Promise((resolve) => {
       idpWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        //console.log('aws sign in - onbeforerequest details:');
+        //console.log(details);
         if (this.leappCoreService.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, details.url)) {
           // it will throw an error as we have altered the original response
           // Setting that everything is ok if we have arrived here
@@ -94,6 +100,8 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
         }
       });
       // 4. Navigate to idpUrl
+      console.log("aws sign in - sanitized field:");
+      console.log(sanitizedField);
       idpWindow.loadURL(sanitizedField);
     });
   }

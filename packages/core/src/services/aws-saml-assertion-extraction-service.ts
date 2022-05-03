@@ -21,10 +21,14 @@ const samlAssertionRegexes = new Map([[CloudProviderType.aws, [/^https:\/\/signi
 
 export class AwsSamlAssertionExtractionService {
   isAuthenticationUrl(cloudProvider: CloudProviderType, url: string): boolean {
+    console.log("isAuthenticationUrl: ");
+    console.log(url);
     return authenticationUrlRegexes.get(cloudProvider).some((regex) => regex.test(url));
   }
 
   isSamlAssertionUrl(cloudProvider: CloudProviderType, url: string): boolean {
+    console.log("isSamlAssertionUrl: ");
+    console.log(url);
     return samlAssertionRegexes.get(cloudProvider).some((regex) => regex.test(url));
   }
 
