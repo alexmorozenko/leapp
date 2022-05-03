@@ -26,7 +26,7 @@ const windowDefaultConfig = {
     icon: path.join(__dirname, `assets/images/Leapp.png`),
     resizable: true,
     webPreferences: {
-      devTools: !environment.production,
+      devTools: true,
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegration: true,
