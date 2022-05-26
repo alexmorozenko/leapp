@@ -223,6 +223,7 @@ export class AppProviderService {
         this.repository,
         this.fileService,
         this.executeService,
+        this.logService,
         constants.azureAccessTokens
       );
     }

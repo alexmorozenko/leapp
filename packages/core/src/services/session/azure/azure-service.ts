@@ -8,6 +8,7 @@ import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
+import { LoggedEntry, LogLevel, LogService } from "../../log-service";
 
 export interface AzureSessionToken {
   tokenType: string;
@@ -29,6 +30,7 @@ export class AzureService extends SessionService {
     repository: Repository,
     private fileService: FileService,
     private executeService: ExecuteService,
+    private logService: LogService,
     private azureAccessTokens: string
   ) {
     super(iSessionNotifier, repository);
@@ -80,7 +82,8 @@ export class AzureService extends SessionService {
       await this.executeService.execute(`az account clear 2>&1`);
       await this.executeService.execute(`az configure --defaults location='' 2>&1`);
     } catch (err) {
-      throw new LeappExecuteError(this, err.message);
+      // throw new LeappExecuteError(this, err.message);
+      this.logService.log(new LoggedEntry(err.message, this, LogLevel.warn));
     } finally {
       this.sessionDeactivated(sessionId);
     }
