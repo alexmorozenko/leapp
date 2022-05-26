@@ -124,7 +124,7 @@ export class AzureService extends SessionService {
         );
       } catch (err) {
         this.sessionDeactivated(sessionId);
-        throw new LeappExecuteError(this, err.message);
+        throw new LeappExecuteError(this, err.message.trim() + ". Check the session parameters and be sure to have the Azure CLI installed");
       }
     }
 
